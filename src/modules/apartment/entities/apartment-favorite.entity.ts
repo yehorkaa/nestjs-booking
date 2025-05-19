@@ -10,7 +10,6 @@ export class ApartmentFavorite {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @ManyToOne(() => User, (user) => user.apartmentFavorites)
-  @JoinColumn()
   user: User;
 
   @ManyToOne(() => Apartment, (apartment) => apartment.favorites)

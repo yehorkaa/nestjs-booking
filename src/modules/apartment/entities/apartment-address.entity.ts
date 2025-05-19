@@ -2,7 +2,7 @@ import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Apartment } from './apartment.entity';
 
 @Entity()
-export class Address {
+export class ApartmentAddress {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

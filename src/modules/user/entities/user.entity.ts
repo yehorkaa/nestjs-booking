@@ -8,6 +8,8 @@ import {
 import { UserProfile } from '../../user-profile/entities/user-profile.entity';
 import { ApartmentReservation } from 'src/modules/apartment/entities/apartment-reservation.entity';
 import { ApartmentFavorite } from 'src/modules/apartment/entities/apartment-favorite.entity';
+import { HotelReservation } from 'src/modules/hotel/entities/hotel-reservation.entity';
+import { HotelFavorite } from 'src/modules/hotel/entities/hotel-favorite.entity';
 
 @Entity()
 export class User {
@@ -18,13 +20,13 @@ export class User {
   email: string;
 
   @Column()
-  password: string;
+  passwordHash: string;
 
   @Column({ enum: ['local'], default: 'local' })
   provider: 'local';
 
-  @Column({ enum: ['creator', 'tenant'], default: 'tenant' })
-  role: 'creator' | 'tenant';
+  @Column({ enum: ['creator', 'propertyOwner'], default: 'creator' })
+  role: 'creator' | 'propertyOwner';
 
   @OneToOne(() => UserProfile, (profile) => profile.user, { cascade: true })
   profile: UserProfile;
@@ -42,4 +44,18 @@ export class User {
     { cascade: true },
   )
   apartmentFavorites: ApartmentFavorite[];
+
+  @OneToMany(
+    () => HotelReservation,
+    (hotelReservation) => hotelReservation.user,
+    { cascade: true },
+  )
+  hotelReservations: HotelReservation[];
+
+  @OneToMany(
+    () => HotelFavorite,
+    (hotelFavorite) => hotelFavorite.user,
+    { cascade: true },
+  )
+  hotelFavorites: HotelFavorite[];
 }
