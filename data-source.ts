@@ -7,8 +7,8 @@ export const AppDataSource = new DataSource({
   username: 'yeqorka',
   password: 'test228',
   database: 'postgres',
-  entities: ['src/**/*.entity{.ts,.js}'],
-  migrations: ['src/migrations/*{.ts,.js}'],
+  entities: ['dist/src/**/*.entity{.ts,.js}'],
+  migrations: ['dist/src/migrations/*{.ts,.js}'],
 });
 
 // In TypeORM we can create/generrate/run migrations
