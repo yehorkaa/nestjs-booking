@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserProfileModule } from './modules/user-profile/user-profile.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ApartmentModule } from './modules/apartment/apartment.module';
+import { HotelModule } from './modules/hotel/hotel.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { ApartmentModule } from './modules/apartment/apartment.module';
     UserProfileModule,
     AuthModule,
     ApartmentModule,
+    HotelModule,
   ],
   controllers: [AppController],
   providers: [AppService],

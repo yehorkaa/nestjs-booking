@@ -6,9 +6,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Address } from './address.entity';
+import { ApartmentAddress } from './apartment-address.entity';
 import { ApartmentReservation } from './apartment-reservation.entity';
 import { ApartmentFavorite } from './apartment-favorite.entity';
+import { ApartmentPrice } from './apartment-price.entity';
 
 @Entity()
 export class Apartment {
@@ -18,27 +19,36 @@ export class Apartment {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
-  @Column()
-  price: number;
+  @OneToMany(
+    () => ApartmentPrice,
+    (apartmentPrice) => apartmentPrice.apartment,
+    { cascade: true },
+  )
+  @JoinColumn()
+  prices: ApartmentPrice[];
 
   @OneToMany(
     () => ApartmentReservation,
     (apartmentReservation) => apartmentReservation.apartment,
+    { cascade: true },
   )
   reservations: ApartmentReservation[];
 
   @OneToMany(
     () => ApartmentFavorite,
     (apartmentFavorite) => apartmentFavorite.apartment,
+    { cascade: true },
   )
   favorites: ApartmentFavorite[];
 
-  @ManyToOne(() => Address, (address) => address.apartment)
+  @ManyToOne(() => ApartmentAddress, (address) => address.apartment, {
+    cascade: true,
+  })
   @JoinColumn()
-  address: Address;
+  address: ApartmentAddress;
 
   @Column('text', { array: true, default: [] })
   images: string[];

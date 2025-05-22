@@ -23,6 +23,6 @@ export class ApartmentReservation {
   @Column('timestamp')
   checkOut: Date;
 
-  @Column({ enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' })
-  status: 'pending' | 'confirmed' | 'cancelled';
+  @Column({ enum: ['confirmed', 'cancelled', 'default'], default: 'default' })
+  status: 'confirmed' | 'cancelled' | 'default';
 }
