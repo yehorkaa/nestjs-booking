@@ -2,6 +2,8 @@ import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGe
 import { HotelRoomPrice } from "./hotel-room-price.entity";
 import { Hotel } from "./hotel.entity";
 import { HotelReservation } from "./hotel-reservation.entity";
+import { HotelRoomImage } from "./hotel-image.entity";
+import { HotelRoomTag } from "./hotel-tag.entity";
 
 @Entity()
 @Unique(['hotel', 'name']) // Unique room name in the scope of different hotels
@@ -15,11 +17,13 @@ export class HotelRoom {
   @Column({ nullable: true })
   description: string;
 
-  @Column('text', { array: true, default: [] })
-  images: string[];
+  @OneToMany(() => HotelRoomImage, (hotelRoomImage) => hotelRoomImage.hotelRoom, { cascade: true })
+  @JoinColumn()
+  images: HotelRoomImage[];
 
-  @Column('text', { array: true, default: [] })
-  tags: string[];
+  @OneToMany(() => HotelRoomTag, (tag) => tag.rooms, { cascade: true })
+  @JoinColumn()
+  tags: HotelRoomTag[];
 
   @Column({ default: 0 })
   quantity: number;

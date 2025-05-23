@@ -10,6 +10,7 @@ import { ApartmentAddress } from './apartment-address.entity';
 import { ApartmentReservation } from './apartment-reservation.entity';
 import { ApartmentFavorite } from './apartment-favorite.entity';
 import { ApartmentPrice } from './apartment-price.entity';
+import { ApartmentImage } from './apartment-image.entity';
 
 @Entity()
 export class Apartment {
@@ -50,6 +51,7 @@ export class Apartment {
   @JoinColumn()
   address: ApartmentAddress;
 
-  @Column('text', { array: true, default: [] })
-  images: string[];
+  @OneToMany(() => ApartmentImage, (apartmentImage) => apartmentImage.apartment, { cascade: true })
+  @JoinColumn()
+  images: ApartmentImage[];
 }
