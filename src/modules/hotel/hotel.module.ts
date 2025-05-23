@@ -7,6 +7,8 @@ import { HotelReservation } from './entities/hotel-reservation.entity';
 import { HotelRoom } from './entities/hotel-room.entity';
 import { HotelRoomPrice } from './entities/hotel-room-price.entity';
 import { HotelFavorite } from './entities/hotel-favorite.entity';
+import { HotelTag, HotelRoomTag } from './entities/hotel-tag.entity';
+import { HotelImage } from './entities/hotel-image.entity';
 
 @Module({
   imports: [
@@ -16,6 +18,9 @@ import { HotelFavorite } from './entities/hotel-favorite.entity';
       HotelRoom,
       HotelRoomPrice,
       HotelFavorite,
+      HotelImage,
+      HotelTag,
+      HotelRoomTag,
     ]),
   ],
   controllers: [HotelController],

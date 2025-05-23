@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApartmentPrice } from './entities/apartment-price.entity';
 import { ApartmentReservation } from './entities/apartment-reservation.entity';
 import { ApartmentFavorite } from './entities/apartment-favorite.entity';
+import { ApartmentImage } from './entities/apartment-image.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -15,6 +16,7 @@ import { ApartmentFavorite } from './entities/apartment-favorite.entity';
       ApartmentPrice,
       ApartmentReservation,
       ApartmentFavorite,
+      ApartmentImage,
     ]),
   ],
   controllers: [ApartmentController],
