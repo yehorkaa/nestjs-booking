@@ -11,7 +11,10 @@ import { SignUpDto } from '../dto/sign-up.dto';
 import { SignInDto } from '../dto/sign-in.dto';
 import { AuthService } from '../auth.service';
 import { USER_ROLES } from '../../user/user.const';
+import { Auth } from '../decorators/auth.decorator';
+import { AUTH_TYPE } from '@nestjs-booking-clone/common';
 
+@Auth(AUTH_TYPE.NONE)
 @Controller('auth/user/tenant')
 export class TenantAuthController {
   constructor(private readonly authService: AuthService) {}

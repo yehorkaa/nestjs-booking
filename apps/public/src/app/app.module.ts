@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ApartmentModule } from './modules/apartment/apartment.module';
 import { HotelModule } from './modules/hotel/hotel.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CommonModule } from './modules/common/common.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    CommonModule,
     UserModule,
     UserProfileModule,
     AuthModule,
