@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { AccessTokenGuard } from './access-token.guard';
 import { AUTH_TYPE, AuthType } from '@nestjs-booking-clone/common';

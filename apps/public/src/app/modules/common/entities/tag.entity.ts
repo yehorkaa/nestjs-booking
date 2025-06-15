@@ -6,4 +6,7 @@ export abstract class Tag {
 
   @Column()
   name: string;
+
+  @Column({ nullable: true })
+  iconName: string;
 }

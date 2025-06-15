@@ -7,7 +7,7 @@ import jwtUserConfig from '../auth/config/jwt-user.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { ConfigModule } from '@nestjs/config';
-import { AuthenticationGuard } from '../auth/guards/authentiocation.guard';
+import { AuthenticationGuard } from '../auth/guards/authentication.guard';
 import { AccessTokenGuard } from '../auth/guards/access-token.guard';
 
 @Module({

@@ -9,6 +9,12 @@ import { ApartmentModule } from './modules/apartment/apartment.module';
 import { HotelModule } from './modules/hotel/hotel.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './modules/common/common.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { Keyv } from 'keyv';
+import { CacheableMemory } from 'cacheable';
+import { createKeyv } from '@keyv/redis';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 
 @Module({
   imports: [
@@ -25,6 +31,43 @@ import { CommonModule } from './modules/common/common.module';
       database: process.env.POSTGRES_NAME,
       autoLoadEntities: true,
       synchronize: true,
+    }),
+    CacheModule.registerAsync({
+      useFactory: () => {
+        return {
+          stores: [
+            new Keyv({
+              store: new CacheableMemory({ ttl: 60000, lruSize: 5000 }),
+            }),
+            createKeyv(process.env.REDIS_URL),
+          ],
+        };
+      },
+    }),
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        transport: {
+          host: 'localhost',
+          port: 1025,
+          ignoreTLS: true,
+          secure: false,
+          auth: {
+            user: process.env.MAILDEV_INCOMING_USER,
+            pass: process.env.MAILDEV_INCOMING_PASS,
+          },
+        },
+        defaults: {
+          from: '"No Reply" <no-reply@localhost>',
+        },
+        preview: true,
+        template: {
+          dir: __dirname + '/templates',
+          adapter: new PugAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
     }),
     CommonModule,
     UserModule,

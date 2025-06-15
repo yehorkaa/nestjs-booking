@@ -8,6 +8,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TenantAuthController } from './controllers/tenant-auth.controller';
 import { PropertyOwnerAuthController } from './controllers/property-owner-auth.controller';
 import { AuthService } from './auth.service';
+import { CacheModule } from '@nestjs/cache-manager';
+import { RefreshTokenIdsStorage } from './storages/refresh-token-ids.storage';
+import { OtpStorage } from './storages/otp.storage';
 
 @Module({
   imports: [
@@ -15,11 +18,12 @@ import { AuthService } from './auth.service';
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync(jwtUserConfig.asProvider()),
     ConfigModule.forFeature(jwtUserConfig),
+    CacheModule.register(),
   ],
   controllers: [
     TenantAuthController,
     PropertyOwnerAuthController,
   ],
-  providers: [AuthService],
+  providers: [AuthService, RefreshTokenIdsStorage, OtpStorage],
 })
 export class AuthModule {}

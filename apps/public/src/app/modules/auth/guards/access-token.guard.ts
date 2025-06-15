@@ -12,7 +12,7 @@ import { Request } from 'express';
 import { REQUEST_USER_KEY } from '../auth.const';
 
 @Injectable()
-export class  AccessTokenGuard implements CanActivate {
+export class AccessTokenGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     @Inject(jwtUserConfig.KEY)

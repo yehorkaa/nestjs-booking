@@ -24,6 +24,9 @@ export class User {
   @Column()
   passwordHash: string;
 
+  @Column({ nullable: true, unique: true })
+  phoneNumber: string;
+
   @Column({ type: 'enum', enum: USER_PROVIDERS, default: USER_PROVIDERS.LOCAL })
   provider: UserProvider;
 
@@ -38,21 +41,21 @@ export class User {
   @OneToMany(
     () => ApartmentReservation,
     (apartmentReservation) => apartmentReservation.user,
-    { cascade: true },
+    { cascade: true }
   )
   apartmentReservations: ApartmentReservation[];
 
   @OneToMany(
     () => ApartmentFavorite,
     (apartmentFavorite) => apartmentFavorite.user,
-    { cascade: true },
+    { cascade: true }
   )
   apartmentFavorites: ApartmentFavorite[];
 
   @OneToMany(
     () => HotelReservation,
     (hotelReservation) => hotelReservation.user,
-    { cascade: true },
+    { cascade: true }
   )
   hotelReservations: HotelReservation[];
 
