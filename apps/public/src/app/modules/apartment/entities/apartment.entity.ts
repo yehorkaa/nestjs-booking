@@ -11,6 +11,7 @@ import { ApartmentReservation } from './apartment-reservation.entity';
 import { ApartmentFavorite } from './apartment-favorite.entity';
 import { ApartmentPrice } from './apartment-price.entity';
 import { ApartmentImage } from './apartment-image.entity';
+import { ApartmentTag } from './apartment-tag.entity';
 
 @Entity()
 export class Apartment {
@@ -54,4 +55,8 @@ export class Apartment {
   @OneToMany(() => ApartmentImage, (apartmentImage) => apartmentImage.apartment, { cascade: true })
   @JoinColumn()
   images: ApartmentImage[];
+
+  @OneToMany(() => ApartmentTag, (apartmentTag) => apartmentTag.apartments, { cascade: true })
+  @JoinColumn()
+  tags: ApartmentTag[];
 }

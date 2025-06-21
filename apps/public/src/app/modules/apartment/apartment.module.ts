@@ -8,6 +8,8 @@ import { ApartmentPrice } from './entities/apartment-price.entity';
 import { ApartmentReservation } from './entities/apartment-reservation.entity';
 import { ApartmentFavorite } from './entities/apartment-favorite.entity';
 import { ApartmentImage } from './entities/apartment-image.entity';
+import { ApartmentTag } from './entities/apartment-tag.entity';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -17,6 +19,7 @@ import { ApartmentImage } from './entities/apartment-image.entity';
       ApartmentReservation,
       ApartmentFavorite,
       ApartmentImage,
+      ApartmentTag,
     ]),
   ],
   controllers: [ApartmentController],
