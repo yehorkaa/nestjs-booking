@@ -47,21 +47,20 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
-          host: 'localhost',
-          port: 1025,
-          ignoreTLS: true,
+          host: process.env.EMAIL_HOST,
+          port: Number(process.env.EMAIL_PORT),
           secure: false,
           auth: {
-            user: process.env.MAILDEV_INCOMING_USER,
-            pass: process.env.MAILDEV_INCOMING_PASS,
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASSWORD,
           },
         },
         defaults: {
-          from: '"No Reply" <no-reply@localhost>',
+          from: `"No Reply" nestjs-booking-clone@gmail.com`,
         },
-        preview: true,
+        preview: false,
         template: {
-          dir: __dirname + '/templates',
+          dir: __dirname +'/app/templates',
           adapter: new PugAdapter(),
           options: {
             strict: true,
@@ -86,6 +85,8 @@ export class AppModule {
       port: process.env.POSTGRES_PORT,
       username: process.env.POSTGRES_USER,
       database: process.env.POSTGRES_NAME,
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
     });
   }
 }
