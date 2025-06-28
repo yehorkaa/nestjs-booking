@@ -124,7 +124,7 @@ export class AuthService {
         phoneNumber: requestOtpDto.phoneNumber,
       });
       if (!user) {
-        throw new UnauthorizedException(
+        throw new Error(
           'User with this phone number does not exist'
         );
       }

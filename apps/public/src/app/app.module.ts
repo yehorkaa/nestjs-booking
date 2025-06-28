@@ -15,6 +15,20 @@ import { CacheableMemory } from 'cacheable';
 import { createKeyv } from '@keyv/redis';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { UploadModule } from './modules/upload/upload.module';
+import { AwsModule } from './modules/aws/aws.module';
+
+// Plan:
+// 1. finish work with upload module
+// 2. finish work with aws module
+// 3. add CRUD for user profile
+// 4. finish nestjs auth course ( look thoroughly at role module )
+// 5. check auth for property owner
+// 6. create CRUD for apartment
+// 7. create CRUD for apartment reservations
+// 8. create CRUD for apartment favorites
+// 9. create CRUD for hotel
+// 10. create CRUD for hotel reservations
 
 @Module({
   imports: [
@@ -37,7 +51,7 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
         return {
           stores: [
             new Keyv({
-              store: new CacheableMemory({ ttl: 60000, lruSize: 5000 }),
+              store: new CacheableMemory({ ttl: 60000 }), // 60000ms = 1 minute
             }),
             createKeyv(process.env.REDIS_URL),
           ],
@@ -74,6 +88,8 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
     AuthModule,
     ApartmentModule,
     HotelModule,
+    UploadModule,
+    AwsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

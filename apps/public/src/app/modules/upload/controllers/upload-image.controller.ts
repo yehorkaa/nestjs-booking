@@ -1,0 +1,90 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  FileTypeValidator,
+  MaxFileSizeValidator,
+  Res,
+  StreamableFile,
+  Delete,
+  Put,
+  Query,
+  ParseIntPipe,
+} from '@nestjs/common';
+import { UploadImageService } from '../services/upload-image.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AUTH_TYPE, MulterFile } from '@nestjs-booking-clone/common';
+import { Auth } from '../../auth/decorators/auth.decorator';
+import { Response } from 'express';
+import {
+  UPLOAD_IMAGE_FILE_TYPE,
+  UPLOAD_IMAGE_MAX_FILE_SIZE,
+} from '../upload.const';
+
+@Auth(AUTH_TYPE.NONE) // TODO: Remove this after testing and in final version
+@Controller('upload/image')
+export class UploadImageController {
+  constructor(private readonly uploadService: UploadImageService) {}
+
+  @Get('all')
+  async getAllImages(@Query('limit', ParseIntPipe) limit: number) {
+    const images = await this.uploadService.getAllImages(limit);
+    return { images };
+  }
+
+  @Get(':fileKey')
+  async getImage(
+    @Param('fileKey') fileKey: string,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const { contentType, buffer } = await this.uploadService.getImage(fileKey);
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', 'inline');
+    return new StreamableFile(buffer);
+  }
+
+  @Post()
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadImage(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({ fileType: UPLOAD_IMAGE_FILE_TYPE }),
+          new MaxFileSizeValidator({ maxSize: UPLOAD_IMAGE_MAX_FILE_SIZE }),
+        ],
+      })
+    )
+    file: MulterFile
+  ) {
+    const url = await this.uploadService.uploadImage(file);
+    return { message: 'File uploaded successfully', url };
+  }
+
+  @Delete(':fileKey')
+  async delete(@Param('fileKey') fileKey: string) {
+    await this.uploadService.deleteImage(fileKey);
+    return { message: 'Image deleted successfully' };
+  }
+
+  @Put(':fileKey')
+  @UseInterceptors(FileInterceptor('file'))
+  async updateImage(
+    @Param('fileKey') fileKey: string,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({ fileType: UPLOAD_IMAGE_FILE_TYPE }),
+          new MaxFileSizeValidator({ maxSize: UPLOAD_IMAGE_MAX_FILE_SIZE }),
+        ],
+      })
+    )
+    file: MulterFile
+  ) {
+    const url = await this.uploadService.updateImage(fileKey, file);
+    return { message: 'Image updated successfully', url };
+  }
+}

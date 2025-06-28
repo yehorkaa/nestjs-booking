@@ -25,4 +25,7 @@ export class UserProfile {
 
   @Column({ nullable: true })
   dateOfBirth: Date;
+
+  @Column({ nullable: true})
+  avatar: string;
 }
