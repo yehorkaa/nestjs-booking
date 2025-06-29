@@ -1,51 +1,17 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { AwsS3Service } from '../../aws/aws-s3.service';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { AwsS3Service } from '../../aws/services/aws-s3.service';
 import { MulterFile } from '@nestjs-booking-clone/common';
 import { v4 as uuidv4 } from 'uuid';
-import { getAppBaseUrl } from 'apps/public/src/app/app.const';
+import { AwsCloudfrontService } from '../../aws/services/aws-cloudfront.service';
 
 @Injectable()
 export class UploadImageService {
-  constructor(private readonly awsS3Service: AwsS3Service) {}
+  constructor(
+    private readonly awsS3Service: AwsS3Service,
+    private readonly awsCloudfrontService: AwsCloudfrontService
+  ) {}
 
   private readonly AWS_S3_PREFIX = 'images/';
-
-  async getAllImages(limit: number) {
-    try {
-      const response = await this.awsS3Service.listObjectsV2(
-        this.AWS_S3_PREFIX,
-        limit
-      );
-      const imagesContents =
-        response.Contents && Array.isArray(response.Contents)
-          ? response.Contents
-          : [];
-      const imagesList = imagesContents.map((image) => {
-        const key = image.Key.split('/').pop();
-        return this.getImageUrl(key);
-      });
-      return imagesList;
-    } catch (error) {
-      throw new BadRequestException('Failed to get all images');
-    }
-  }
-
-  async getImage(fileKey: string) {
-    try {
-      const awsS3Key = this.getImageAwsS3Key(fileKey);
-      const response = await this.awsS3Service.getFileBuffer(awsS3Key);
-      return {
-        contentType: response.ContentType,
-        buffer: response.Body,
-      };
-    } catch (error) {
-      throw new NotFoundException('Failed to get image');
-    }
-  }
 
   async uploadImage(file: MulterFile) {
     try {
@@ -64,6 +30,7 @@ export class UploadImageService {
     try {
       const awsS3Key = this.getImageAwsS3Key(fileKey);
       await this.awsS3Service.delete(awsS3Key);
+      await this.awsCloudfrontService.invalidate([awsS3Key]);
     } catch (error) {
       throw new BadRequestException('Failed to delete image');
     }
@@ -75,6 +42,7 @@ export class UploadImageService {
       await this.awsS3Service.upload(awsS3Key, file.buffer, {
         ContentType: file.mimetype,
       });
+      await this.awsCloudfrontService.invalidate([awsS3Key]);
       return this.getImageUrl(fileKey);
     } catch (error) {
       throw new BadRequestException('Failed to update image');
@@ -82,7 +50,7 @@ export class UploadImageService {
   }
 
   private getImageUrl(fileKey: string) {
-    return `${getAppBaseUrl()}/upload/image/${fileKey}`;
+    return this.awsS3Service.getPublicUrl(this.getImageAwsS3Key(fileKey));
   }
 
   private getImageAwsS3Key(fileKey: string) {

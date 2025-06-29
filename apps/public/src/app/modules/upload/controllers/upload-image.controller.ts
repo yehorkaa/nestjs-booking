@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Param,
   UseInterceptors,
@@ -8,12 +7,8 @@ import {
   ParseFilePipe,
   FileTypeValidator,
   MaxFileSizeValidator,
-  Res,
-  StreamableFile,
   Delete,
   Put,
-  Query,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { UploadImageService } from '../services/upload-image.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -29,24 +24,6 @@ import {
 @Controller('upload/image')
 export class UploadImageController {
   constructor(private readonly uploadService: UploadImageService) {}
-
-  @Get('all')
-  async getAllImages(@Query('limit', ParseIntPipe) limit: number) {
-    const images = await this.uploadService.getAllImages(limit);
-    return { images };
-  }
-
-  @Get(':fileKey')
-  async getImage(
-    @Param('fileKey') fileKey: string,
-    @Res({ passthrough: true }) res: Response
-  ) {
-    const { contentType, buffer } = await this.uploadService.getImage(fileKey);
-    res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Disposition', 'inline');
-    return new StreamableFile(buffer);
-  }
-
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(

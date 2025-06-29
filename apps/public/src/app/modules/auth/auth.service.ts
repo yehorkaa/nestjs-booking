@@ -36,7 +36,6 @@ export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @Inject(BCRYPT_SERVICE) private readonly bcryptService: BcryptService,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @Inject(jwtUserConfig.KEY)
     private readonly jwtUserConfiguration: ConfigType<typeof jwtUserConfig>,
     private readonly jwtService: JwtService,

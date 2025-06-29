@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import awsS3Config from './config/aws-s3.config';
+import awsS3Config from '../config/aws.config';
 import { ConfigType } from '@nestjs/config';
 import {
   GetObjectCommand,
@@ -16,17 +16,11 @@ import { Readable } from 'stream';
 
 @Injectable()
 export class AwsS3Service {
-  private readonly s3 = new S3Client({
-    region: this.awsS3Configuration.region,
-    credentials: {
-      accessKeyId: this.awsS3Configuration.accessKeyId,
-      secretAccessKey: this.awsS3Configuration.secretAccessKey,
-    },
-  });
-
   constructor(
     @Inject(awsS3Config.KEY)
-    private readonly awsS3Configuration: ConfigType<typeof awsS3Config>
+    private readonly awsS3Configuration: ConfigType<typeof awsS3Config>,
+    @Inject(S3Client)
+    private readonly s3: S3Client
   ) {}
 
   async listObjectsV2(
@@ -71,7 +65,7 @@ export class AwsS3Service {
   }
 
   getPublicUrl(fileKey: string) {
-    return `https://${this.awsS3Configuration.bucketName}.s3.${this.awsS3Configuration.region}.amazonaws.com/${fileKey}`;
+    return `https://${this.awsS3Configuration.cloudfrontDomain}/${fileKey}`;
   }
 
   async delete(fileKey: string, rest?: Partial<DeleteObjectCommandInput>) {

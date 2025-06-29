@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
 import { UserProfileModule } from './modules/user-profile/user-profile.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ApartmentModule } from './modules/apartment/apartment.module';
@@ -17,6 +17,9 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { UploadModule } from './modules/upload/upload.module';
 import { AwsModule } from './modules/aws/aws.module';
+import redisCacheConfig from './config/cache.config';
+import postgresConfig from './config/postgres.config';
+import mailerConfig from './config/mailer.config';
 
 // Plan:
 // 1. finish work with upload module
@@ -35,52 +38,70 @@ import { AwsModule } from './modules/aws/aws.module';
     ConfigModule.forRoot({
       envFilePath: ['apps/public/.env'],
       isGlobal: true,
+      load: [redisCacheConfig, postgresConfig, mailerConfig],
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.POSTGRES_HOST,
-      port: Number(process.env.POSTGRES_PORT),
-      username: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_NAME,
-      autoLoadEntities: true,
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (
+        postgresConfiguration: ConfigType<typeof postgresConfig>
+      ) => {
+        console.log('postgresConfiguration 🔧', postgresConfiguration);
+        return {
+          type: 'postgres',
+          host: postgresConfiguration.host,
+          port: postgresConfiguration.port,
+          username: postgresConfiguration.username,
+          password: postgresConfiguration.password,
+          database: postgresConfiguration.database,
+          autoLoadEntities: true,
+          synchronize: true,
+        };
+      },
+      inject: [postgresConfig.KEY],
     }),
     CacheModule.registerAsync({
-      useFactory: () => {
+      imports: [ConfigModule],
+      useFactory: (cacheConfiguration: ConfigType<typeof redisCacheConfig>) => {
+        console.log('cacheConfiguration 🔧', cacheConfiguration);
         return {
           stores: [
             new Keyv({
-              store: new CacheableMemory({ ttl: 60000 }), // 60000ms = 1 minute
+              store: new CacheableMemory({ ttl: cacheConfiguration.ttl }),
             }),
-            createKeyv(process.env.REDIS_URL),
+            createKeyv(cacheConfiguration.redisUrl),
           ],
         };
       },
+      inject: [redisCacheConfig.KEY],
     }),
     MailerModule.forRootAsync({
-      useFactory: () => ({
-        transport: {
-          host: process.env.EMAIL_HOST,
-          port: Number(process.env.EMAIL_PORT),
-          secure: false,
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD,
+      imports: [ConfigModule],
+      useFactory: (mailerConfiguration: ConfigType<typeof mailerConfig>) => {
+        console.log('mailerConfiguration 🔧', mailerConfiguration);
+        return {
+          transport: {
+            host: mailerConfiguration.host,
+            port: mailerConfiguration.port,
+            secure: false,
+            auth: {
+              user: mailerConfiguration.auth.user,
+              pass: mailerConfiguration.auth.pass,
+            },
           },
-        },
-        defaults: {
-          from: `"No Reply" nestjs-booking-clone@gmail.com`,
-        },
-        preview: false,
-        template: {
-          dir: __dirname +'/app/templates',
-          adapter: new PugAdapter(),
-          options: {
-            strict: true,
+          defaults: {
+            from: `"No Reply" nestjs-booking-clone@gmail.com`,
           },
-        },
-      }),
+          preview: false,
+          template: {
+            dir: __dirname + '/app/templates',
+            adapter: new PugAdapter(),
+            options: {
+              strict: true,
+            },
+          },
+        };
+      },
+      inject: [mailerConfig.KEY],
     }),
     CommonModule,
     UserModule,
@@ -94,15 +115,4 @@ import { AwsModule } from './modules/aws/aws.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  constructor() {
-    console.log('Database Configuration:', {
-      host: process.env.POSTGRES_HOST,
-      port: process.env.POSTGRES_PORT,
-      username: process.env.POSTGRES_USER,
-      database: process.env.POSTGRES_NAME,
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    });
-  }
-}
+export class AppModule {}
