@@ -14,10 +14,13 @@ import { USER_ROLES } from '../../user/user.const';
 import { Auth } from '../decorators/auth.decorator';
 import { AUTH_TYPE } from '@nestjs-booking-clone/common';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
-import { RequestOtpDto } from '../dto/request-otp.dto';
 import { VerifyOtpDto } from '../dto/verify-otp.dto';
 import { LogoutDto } from '../dto/log-out.dto';
-import { ActiveUser, ActiveUserModel } from '../decorators/active-user.decorator';
+import {
+  ActiveUser,
+  ActiveUserModel,
+} from '../decorators/active-user.decorator';
+import { RequestOtpDto } from '../dto/request-otp.dto';
 
 @Auth(AUTH_TYPE.NONE)
 @Controller('auth/user/tenant')
@@ -42,7 +45,7 @@ export class TenantAuthController {
   @Post('sign-in')
   async signIn(
     @Res({ passthrough: true }) response: Response,
-    @Body() signInDto: SignInDto,
+    @Body() signInDto: SignInDto
   ) {
     const { accessToken, refreshToken } = await this.authService.signIn(signInDto);
     response.cookie('accessToken', accessToken, {
@@ -71,17 +74,13 @@ export class TenantAuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('request-otp')
-  async requestOtp(
-    @Body() requestOtpDto: RequestOtpDto
-  ) {
+  async requestOtp(@Body() requestOtpDto: RequestOtpDto) {
     return this.authService.requestOtp(requestOtpDto);
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('verify-otp')
-  async verifyOtp(
-    @Body() verifyOtpDto: VerifyOtpDto
-  ) {
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
     return this.authService.verifyOtp(verifyOtpDto);
   }
 

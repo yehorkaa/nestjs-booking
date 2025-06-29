@@ -17,6 +17,8 @@ nx g @nrwl/workspace:remove shared
 ENV must be on the level of app, for example: apps/public/.env, and path for ConfigModule.forRoot and docker-compose should be changed
 accordingly, like apps/public/.env
 
+// docker-compose -f docker-compose.dev.yml up dev
+
 // TEMP
 version: '3.8'
 
@@ -33,13 +35,13 @@ services:
       POSTGRES_DB: postgres
     ports:
       - "5433:5432"
-      # 5433 — это порт на твоей машине (host), то есть ты будешь подключаться к базе через localhost:5433, 
-      # 5432 — это внутренний порт в контейнере, на котором PostgreSQL всегда работает по умолчанию
+      # 5433 — this is an inner PORT on your local machine ( host ), so you gonna connect to the DB via localhost:5433
+      # 5432 — this is an inner PORT in container where PostgreSQL always works by default
     volumes:
-      # это путь к postgres_data_booking
+      # this is a path to postgres_data_booking
       - postgres_data_booking:/var/lib/postgresql/data
 
-# это надо чтоб докер не удалял данные при перезапуске контейнера и сам создал папку
+# We need this so that docker doesn't delete data after relaunching a container and created folder by himself это надо чтоб докер не удалял данные при перезапуске контейнера и сам создал папку
 volumes:
   postgres_data_booking:
     name: postgres_data_booking

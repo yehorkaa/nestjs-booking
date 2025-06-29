@@ -19,7 +19,6 @@ import { PG_ERROR_CODES } from '@nestjs-booking-clone/common';
 import { BCRYPT_SERVICE } from '../common/const/service.const';
 import { ActiveUserModel } from './decorators/active-user.decorator';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { RequestOtpDto } from './dto/request-otp.dto';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { randomUUID } from 'crypto';
@@ -29,18 +28,20 @@ import {
 } from './storages/refresh-token-ids.storage';
 import { InvalidOtpError, OtpStorage } from './storages/otp.storage';
 import { LogoutDto } from './dto/log-out.dto';
+import { MailerService } from '@nestjs-modules/mailer';
+import { RequestOtpDto } from './dto/request-otp.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @Inject(BCRYPT_SERVICE) private readonly bcryptService: BcryptService,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     @Inject(jwtUserConfig.KEY)
     private readonly jwtUserConfiguration: ConfigType<typeof jwtUserConfig>,
     private readonly jwtService: JwtService,
     private readonly refreshTokenIdsStorage: RefreshTokenIdsStorage,
-    private readonly otpStorage: OtpStorage
+    private readonly otpStorage: OtpStorage,
+    private readonly mailerService: MailerService
   ) {}
 
   async signUp(signUpDto: SignUpDto, role: UserRole) {
@@ -122,7 +123,7 @@ export class AuthService {
         phoneNumber: requestOtpDto.phoneNumber,
       });
       if (!user) {
-        throw new UnauthorizedException(
+        throw new Error(
           'User with this phone number does not exist'
         );
       }
@@ -131,9 +132,18 @@ export class AuthService {
       if (cachedOtp) {
         throw new Error('OTP already exists');
       }
-      const { otp, expires } = await this.otpStorage.generateOtp();
+      const { otp } = await this.otpStorage.generateOtp();
       await this.otpStorage.insert(user.phoneNumber, otp);
-      return { otp, expires };
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'OTP for NestJS Booking Clone',
+        template: 'otp',
+        context: {
+          name: user.email,
+          otp,
+        },
+      })
+      return { message: `OTP sent to ${user.email}. Check your inbox.` };
     } catch (error) {
       if (error.message) {
         throw new Error(error);

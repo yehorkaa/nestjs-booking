@@ -63,4 +63,10 @@ export class User {
     cascade: true,
   })
   hotelFavorites: HotelFavorite[];
+
+  // TODO: Add permissions, for example to allow admin to ban users, you can do this with table permissions or with token but better table
+  // also need to add guard that is gonna check if user has permission to do something by sending sql query
+  // permissions: UserPermission[]
+  // UserPermission: { expiresAt: Date, assignedAt: Date, permission: Permission }
+
 }

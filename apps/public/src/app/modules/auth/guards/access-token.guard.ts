@@ -23,7 +23,7 @@ export class AccessTokenGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Token is required!');
     }
     try {
       const payload = await this.jwtService.verifyAsync(
@@ -32,7 +32,7 @@ export class AccessTokenGuard implements CanActivate {
       );
       request[REQUEST_USER_KEY] = payload;
     } catch (e) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Token is invalid!');
     }
     return true;
   }
