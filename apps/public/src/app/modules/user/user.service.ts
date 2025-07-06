@@ -10,7 +10,9 @@ export class UserService {
   ) {}
 
   async findAll() {
-    const users = await this.userRepository.find({ relations: { profile: true } });
+    const users = await this.userRepository.find({ 
+      relations: ['profile', 'profile.avatars']
+    });
     return users;
   }
 
@@ -19,7 +21,18 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User does not exist!');
     }
+    const deletedUser = await this.userRepository.remove(user);
+    return deletedUser;
+  }
 
-    return this.userRepository.remove(user);
+  async findById(id: string) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['profile', 'profile.avatars']
+    });
+    if (!user) {
+      throw new NotFoundException('User does not exist!');
+    }
+    return user;
   }
 }

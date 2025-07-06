@@ -20,7 +20,7 @@ export class UploadImageService {
       await this.awsS3Service.upload(awsS3Key, file.buffer, {
         ContentType: file.mimetype,
       });
-      return this.getImageUrl(fileKey);
+      return { url: this.getImageUrl(fileKey), key: fileKey };
     } catch (error) {
       throw new BadRequestException('Failed to upload image');
     }
@@ -31,6 +31,7 @@ export class UploadImageService {
       const awsS3Key = this.getImageAwsS3Key(fileKey);
       await this.awsS3Service.delete(awsS3Key);
       await this.awsCloudfrontService.invalidate([awsS3Key]);
+      return { key: fileKey };
     } catch (error) {
       throw new BadRequestException('Failed to delete image');
     }
@@ -43,7 +44,7 @@ export class UploadImageService {
         ContentType: file.mimetype,
       });
       await this.awsCloudfrontService.invalidate([awsS3Key]);
-      return this.getImageUrl(fileKey);
+      return { url: this.getImageUrl(fileKey), key: fileKey };
     } catch (error) {
       throw new BadRequestException('Failed to update image');
     }

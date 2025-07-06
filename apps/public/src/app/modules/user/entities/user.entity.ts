@@ -34,7 +34,7 @@ export class User {
   role: UserRole;
 
   @OneToOne(() => UserProfile, (profile) => profile.user, {
-    cascade: true,
+    cascade: true, // cascade allows us to save user with profile, but we can't do this in opposite direction, and also cascade should be used in one direction only
   })
   profile: UserProfile;
 

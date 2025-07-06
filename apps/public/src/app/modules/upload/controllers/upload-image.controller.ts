@@ -14,7 +14,6 @@ import { UploadImageService } from '../services/upload-image.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AUTH_TYPE, MulterFile } from '@nestjs-booking-clone/common';
 import { Auth } from '../../auth/decorators/auth.decorator';
-import { Response } from 'express';
 import {
   UPLOAD_IMAGE_FILE_TYPE,
   UPLOAD_IMAGE_MAX_FILE_SIZE,
@@ -37,14 +36,14 @@ export class UploadImageController {
     )
     file: MulterFile
   ) {
-    const url = await this.uploadService.uploadImage(file);
-    return { message: 'File uploaded successfully', url };
+    const { url, key } = await this.uploadService.uploadImage(file);
+    return { url, key };
   }
 
   @Delete(':fileKey')
   async delete(@Param('fileKey') fileKey: string) {
-    await this.uploadService.deleteImage(fileKey);
-    return { message: 'Image deleted successfully' };
+    const { key } = await this.uploadService.deleteImage(fileKey);
+    return { key };
   }
 
   @Put(':fileKey')
@@ -61,7 +60,7 @@ export class UploadImageController {
     )
     file: MulterFile
   ) {
-    const url = await this.uploadService.updateImage(fileKey, file);
-    return { message: 'Image updated successfully', url };
+    const { url, key } = await this.uploadService.updateImage(fileKey, file);
+    return { url, key };
   }
 }

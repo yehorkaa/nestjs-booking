@@ -2,11 +2,13 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { GENDER, Gender } from '@nestjs-booking-clone/common';
+import { UserProfileAvatar } from './user-profile-avatar.entity';
 
 @Entity()
 export class UserProfile {
@@ -26,6 +28,9 @@ export class UserProfile {
   @Column({ nullable: true })
   dateOfBirth: Date;
 
-  @Column({ nullable: true})
-  avatar: string;
+  @OneToMany(() => UserProfileAvatar, (avatar) => avatar.userProfile, {
+    cascade: true,
+  })
+  @JoinColumn()
+  avatars: UserProfileAvatar[];
 }

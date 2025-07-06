@@ -34,6 +34,51 @@
           "buildTarget": "public:build:production"
         }
       }
+    },
+    "mig:gen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node -r tsconfig-paths/register --project tsconfig.app.json ../../node_modules/typeorm/cli migration:generate src/app/migrations/{args.name} --pretty -d data-source.ts",
+        "forwardAllArgs": true,
+        "cwd": "{projectRoot}"
+      }
+    },
+    "mig:run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node -r tsconfig-paths/register --project tsconfig.app.json ../../node_modules/typeorm/cli migration:run -d data-source.ts",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "mig:run-one": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node -r tsconfig-paths/register --project tsconfig.app.json ./src/app/migrations/{args.name} --run",
+        "forwardAllArgs": true,
+        "cwd": "{projectRoot}"
+      }
+    },
+    "mig:revert": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node -r tsconfig-paths/register --project tsconfig.app.json ../../node_modules/typeorm/cli migration:revert -d data-source.ts",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "mig:create": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node -r tsconfig-paths/register --project tsconfig.app.json ../../node_modules/typeorm/cli migration:create src/app/migrations/{args.name}",
+        "forwardAllArgs": true,
+        "cwd": "{projectRoot}"
+      }
+    },
+    "mig:show": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ts-node -r tsconfig-paths/register --project tsconfig.app.json ../../node_modules/typeorm/cli migration:show -d data-source.ts",
+        "cwd": "{projectRoot}"
+      }
     }
   }
 }
