@@ -14,7 +14,6 @@ import jwtUserConfig from './config/jwt-user.config';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UserProfile } from '../user-profile/entities/user-profile.entity';
 import { SignInDto } from './dto/sign-in.dto';
-import { UserRole } from '../user/user.type';
 import { PG_ERROR_CODES } from '@nestjs-booking-clone/common';
 import { BCRYPT_SERVICE } from '../common/const/service.const';
 import { ActiveUserModel } from './decorators/active-user.decorator';
@@ -44,12 +43,11 @@ export class AuthService {
     private readonly mailerService: MailerService
   ) {}
 
-  async signUp(signUpDto: SignUpDto, role: UserRole) {
+  async signUp(signUpDto: SignUpDto) {
     try {
       const user = new User();
       user.email = signUpDto.email;
       user.passwordHash = await this.bcryptService.hash(signUpDto.password);
-      user.role = role;
 
       const profile = new UserProfile();
       profile.name = signUpDto.name;
@@ -233,7 +231,7 @@ export class AuthService {
         user.id,
         this.jwtUserConfiguration.accessTokenTTL,
         {
-          role: user.role,
+          roles: user.roles,
           email: user.email,
         }
       ),

@@ -3,7 +3,7 @@ const { join } = require('path');
 
 module.exports = {
   output: {
-    path: join(__dirname, '../../dist/apps/public'),
+    path: join(__dirname, '../../dist/apps/kyc'),
   },
   plugins: [
     new NxAppWebpackPlugin({
@@ -11,13 +11,10 @@ module.exports = {
       compiler: 'tsc',
       main: './src/main.ts',
       tsConfig: './tsconfig.app.json',
-      assets: ['./src/assets', './src/app/templates'],
+      assets: ['./src/assets'],
       optimization: false,
       outputHashing: 'none',
       generatePackageJson: true,
-      watch: true,
-      poll: 1000,
-      watchDependencies: ['apps/public/**/*.ts'],
     }),
   ],
 };

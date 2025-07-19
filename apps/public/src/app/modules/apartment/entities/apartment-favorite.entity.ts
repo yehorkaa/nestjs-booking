@@ -8,10 +8,11 @@ import { Apartment } from "./apartment.entity";
 export class ApartmentFavorite {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @ManyToOne(() => User, (user) => user.apartmentFavorites)
+
+  @ManyToOne(() => User, (user) => user.apartmentFavorites, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Apartment, (apartment) => apartment.favorites)
+  @ManyToOne(() => Apartment, (apartment) => apartment.favorites, { onDelete: 'CASCADE' })
   @JoinColumn()
   apartment: Apartment;
 

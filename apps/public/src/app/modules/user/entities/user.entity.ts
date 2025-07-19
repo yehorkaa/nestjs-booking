@@ -30,8 +30,13 @@ export class User {
   @Column({ type: 'enum', enum: USER_PROVIDERS, default: USER_PROVIDERS.LOCAL })
   provider: UserProvider;
 
-  @Column({ type: 'enum', enum: USER_ROLES, default: USER_ROLES.TENANT })
-  role: UserRole;
+  @Column({
+    type: 'enum',
+    enum: USER_ROLES,
+    array: true,
+    default: [USER_ROLES.TENANT],
+  })
+  roles: UserRole[];
 
   @OneToOne(() => UserProfile, (profile) => profile.user, {
     cascade: true, // cascade allows us to save user with profile, but we can't do this in opposite direction, and also cascade should be used in one direction only
@@ -68,5 +73,4 @@ export class User {
   // also need to add guard that is gonna check if user has permission to do something by sending sql query
   // permissions: UserPermission[]
   // UserPermission: { expiresAt: Date, assignedAt: Date, permission: Permission }
-
 }

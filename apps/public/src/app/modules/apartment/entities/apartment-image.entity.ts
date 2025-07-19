@@ -4,6 +4,6 @@ import { Apartment } from "./apartment.entity";
 
 @Entity()
 export class ApartmentImage extends Image {
-    @ManyToOne(() => Apartment, (apartment) => apartment.images)
+    @ManyToOne(() => Apartment, (apartment) => apartment.images, { onDelete: 'CASCADE' })
     apartment: Apartment;
 }
