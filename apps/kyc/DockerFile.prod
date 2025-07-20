@@ -1,0 +1,8 @@
+FROM node:20
+
+WORKDIR /app
+
+# Copy only the source code - dependencies come from shared volume
+COPY . .
+
+EXPOSE 3001

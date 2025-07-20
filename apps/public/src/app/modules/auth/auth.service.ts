@@ -14,12 +14,10 @@ import jwtUserConfig from './config/jwt-user.config';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UserProfile } from '../user-profile/entities/user-profile.entity';
 import { SignInDto } from './dto/sign-in.dto';
-import { UserRole } from '../user/user.type';
 import { PG_ERROR_CODES } from '@nestjs-booking-clone/common';
 import { BCRYPT_SERVICE } from '../common/const/service.const';
 import { ActiveUserModel } from './decorators/active-user.decorator';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { randomUUID } from 'crypto';
 import {
@@ -30,7 +28,7 @@ import { InvalidOtpError, OtpStorage } from './storages/otp.storage';
 import { LogoutDto } from './dto/log-out.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { RequestOtpDto } from './dto/request-otp.dto';
-
+import { pick } from 'lodash';
 @Injectable()
 export class AuthService {
   constructor(
@@ -44,12 +42,11 @@ export class AuthService {
     private readonly mailerService: MailerService
   ) {}
 
-  async signUp(signUpDto: SignUpDto, role: UserRole) {
+  async signUp(signUpDto: SignUpDto) {
     try {
       const user = new User();
       user.email = signUpDto.email;
       user.passwordHash = await this.bcryptService.hash(signUpDto.password);
-      user.role = role;
 
       const profile = new UserProfile();
       profile.name = signUpDto.name;
@@ -57,12 +54,28 @@ export class AuthService {
 
       await this.userRepository.save(user);
 
-      const { accessToken, refreshToken } = await this.generateTokens(user);
-
-      return { user, accessToken, refreshToken };
+      try {
+        const { accessToken, refreshToken } = await this.generateTokens(user);
+        return {
+          user: {
+            ...pick(user, ['id', 'email', 'phoneNumber', 'roles']),
+            profile: pick(user.profile, [
+              'name',
+              'avatars',
+              'gender',
+              'dateOfBirth',
+            ]),
+          },
+          accessToken,
+          refreshToken,
+        };
+      } catch (err) {
+        await this.userRepository.delete(user.id);
+        throw err;
+      }
     } catch (err) {
       if (err.code === PG_ERROR_CODES.UNIQUE_VIOLATION) {
-        throw new ConflictException();
+        throw new ConflictException('User already exists');
       }
       throw err;
     }
@@ -123,9 +136,7 @@ export class AuthService {
         phoneNumber: requestOtpDto.phoneNumber,
       });
       if (!user) {
-        throw new Error(
-          'User with this phone number does not exist'
-        );
+        throw new Error('User with this phone number does not exist');
       }
 
       const cachedOtp = await this.otpStorage.getOtp(user.phoneNumber);
@@ -142,7 +153,7 @@ export class AuthService {
           name: user.email,
           otp,
         },
-      })
+      });
       return { message: `OTP sent to ${user.email}. Check your inbox.` };
     } catch (error) {
       if (error.message) {
@@ -182,14 +193,11 @@ export class AuthService {
     try {
       const { refreshTokenId } = await this.jwtService.verifyAsync<
         Pick<ActiveUserModel, 'sub'> & { refreshTokenId: string }
-      >(
-        logoutDto.refreshToken,
-        {
-          secret: this.jwtUserConfiguration.secret,
-          audience: this.jwtUserConfiguration.audience,
-          issuer: this.jwtUserConfiguration.issuer,
-        }
-      );
+      >(logoutDto.refreshToken, {
+        secret: this.jwtUserConfiguration.secret,
+        audience: this.jwtUserConfiguration.audience,
+        issuer: this.jwtUserConfiguration.issuer,
+      });
       const userKey = `${userId}-${refreshTokenId}`;
       const isValid = await this.refreshTokenIdsStorage.validate(
         userKey,
@@ -227,13 +235,13 @@ export class AuthService {
 
   private async generateTokens(user: User) {
     const refreshTokenId = randomUUID();
-    
+
     const [accessToken, refreshToken] = await Promise.all([
       this.signAsyncToken<Partial<ActiveUserModel>>(
         user.id,
         this.jwtUserConfiguration.accessTokenTTL,
         {
-          role: user.role,
+          roles: user.roles,
           email: user.email,
         }
       ),
@@ -241,7 +249,10 @@ export class AuthService {
         refreshTokenId,
       }),
     ]);
-    await this.refreshTokenIdsStorage.insert(`${user.id}-${refreshTokenId}`, refreshTokenId);
+    await this.refreshTokenIdsStorage.insert(
+      `${user.id}-${refreshTokenId}`,
+      refreshTokenId
+    );
     return { accessToken, refreshToken };
   }
 }

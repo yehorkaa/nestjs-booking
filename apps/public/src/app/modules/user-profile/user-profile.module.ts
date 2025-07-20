@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 import { UploadImageService } from '../upload/services/upload-image.service';
 import { AwsModule } from '../aws/aws.module';
+import { TransactionHelper } from '../../helpers/transaction.helper';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { AwsModule } from '../aws/aws.module';
     AwsModule,
   ],
   controllers: [UserProfileController],
-  providers: [UserProfileService, UploadImageService],
+  providers: [UserProfileService, UploadImageService, TransactionHelper],
 })
 export class UserProfileModule {}

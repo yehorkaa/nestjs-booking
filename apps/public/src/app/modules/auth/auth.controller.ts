@@ -7,24 +7,23 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { SignUpDto } from '../dto/sign-up.dto';
-import { SignInDto } from '../dto/sign-in.dto';
-import { AuthService } from '../auth.service';
-import { USER_ROLES } from '../../user/user.const';
-import { Auth } from '../decorators/auth.decorator';
+import { SignUpDto } from './dto/sign-up.dto';
+import { SignInDto } from './dto/sign-in.dto';
+import { AuthService } from './auth.service';
+import { Auth } from './decorators/auth.decorator';
 import { AUTH_TYPE } from '@nestjs-booking-clone/common';
-import { RefreshTokenDto } from '../dto/refresh-token.dto';
-import { VerifyOtpDto } from '../dto/verify-otp.dto';
-import { LogoutDto } from '../dto/log-out.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { LogoutDto } from './dto/log-out.dto';
 import {
   ActiveUser,
   ActiveUserModel,
-} from '../decorators/active-user.decorator';
-import { RequestOtpDto } from '../dto/request-otp.dto';
+} from './decorators/active-user.decorator';
+import { RequestOtpDto } from './dto/request-otp.dto';
 
 @Auth(AUTH_TYPE.NONE)
-@Controller('auth/user/tenant')
-export class TenantAuthController {
+@Controller('auth/user')
+export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('sign-up')
@@ -32,7 +31,9 @@ export class TenantAuthController {
     @Res({ passthrough: true }) response: Response,
     @Body() signUpDto: SignUpDto
   ) {
-    const { user, accessToken, refreshToken } = await this.authService.signUp(signUpDto, USER_ROLES.TENANT);
+    const { user, accessToken, refreshToken } = await this.authService.signUp(
+      signUpDto
+    );
     response.cookie('accessToken', accessToken, {
       secure: true,
       httpOnly: true,
@@ -47,7 +48,9 @@ export class TenantAuthController {
     @Res({ passthrough: true }) response: Response,
     @Body() signInDto: SignInDto
   ) {
-    const { accessToken, refreshToken } = await this.authService.signIn(signInDto);
+    const { accessToken, refreshToken } = await this.authService.signIn(
+      signInDto
+    );
     response.cookie('accessToken', accessToken, {
       secure: true, // only send cookie over https, if for example localhost is not https, then it will not send the cookie
       httpOnly: true, // to protect cookie from XSS attacks, like document.cookie
@@ -63,7 +66,9 @@ export class TenantAuthController {
     @Res({ passthrough: true }) response: Response,
     @Body() refreshTokenDto: RefreshTokenDto
   ) {
-    const { accessToken, refreshToken } = await this.authService.refreshToken(refreshTokenDto);
+    const { accessToken, refreshToken } = await this.authService.refreshToken(
+      refreshTokenDto
+    );
     response.cookie('accessToken', accessToken, {
       secure: true,
       httpOnly: true,

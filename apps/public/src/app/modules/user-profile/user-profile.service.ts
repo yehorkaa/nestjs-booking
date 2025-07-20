@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { User } from '../user/entities/user.entity';
 import { PG_ERROR_CODES } from 'packages/common/src/const/pg-codes.const';
@@ -13,6 +13,7 @@ import { MulterFile } from '@nestjs-booking-clone/common';
 import { UploadImageService } from '../upload/services/upload-image.service';
 import { UserProfile } from './entities/user-profile.entity';
 import { UserProfileAvatar } from './entities/user-profile-avatar.entity';
+import { TransactionHelper } from '../../helpers/transaction.helper';
 
 @Injectable()
 export class UserProfileService {
@@ -21,10 +22,8 @@ export class UserProfileService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserProfile)
     private readonly userProfileRepository: Repository<UserProfile>,
-    @InjectRepository(UserProfileAvatar)
-    private readonly userProfileAvatarRepository: Repository<UserProfileAvatar>,
     private readonly uploadImageService: UploadImageService,
-    private readonly dataSource: DataSource
+    private readonly transactionHelper: TransactionHelper
   ) {}
 
   async updateUserProfile(
@@ -75,9 +74,7 @@ export class UserProfileService {
     if (!newAvatarUrl || !newAvatarKey) {
       throw new InternalServerErrorException('Failed to upload avatar');
     }
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const queryRunner = await this.transactionHelper.start();
     try {
       const userProfileAvatarRepo =
         queryRunner.manager.getRepository(UserProfileAvatar);
@@ -126,9 +123,7 @@ export class UserProfileService {
       throw new NotFoundException('User profile not found');
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const queryRunner = await this.transactionHelper.start();
     try {
       const userProfileAvatarRepo =
         queryRunner.manager.getRepository(UserProfileAvatar);
@@ -168,9 +163,7 @@ export class UserProfileService {
       throw new NotFoundException('User profile not found');
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const queryRunner = await this.transactionHelper.start();
 
     try {
       const userProfileAvatarRepo =

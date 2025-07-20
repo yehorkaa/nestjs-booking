@@ -16,6 +16,6 @@ export class ApartmentPrice {
     @Column('timestamp')
     endDate: Date;
     
-   @ManyToOne(() => Apartment, (apartment) => apartment.prices)
+   @ManyToOne(() => Apartment, (apartment) => apartment.prices, { onDelete: 'CASCADE' })
    apartment: Apartment;
 }

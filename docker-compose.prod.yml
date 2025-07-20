@@ -1,0 +1,110 @@
+services:
+  # TODO: create prod dependencies
+  deps:
+    container_name: deps_booking
+    build:
+      context: .
+      dockerfile: Dockerfile.prod.base
+    volumes:
+      - node_modules_volume:/app/node_modules
+      - .:/app    
+    command: tail -f /dev/null
+  public_api:
+    container_name: public_api_booking
+    restart: always
+    depends_on:
+      - deps
+      - postgres_db
+      - redis
+    build:
+      context: .
+      dockerfile: apps/public/DockerFile.prod
+    ports:
+      - '3000:3000'
+    environment:
+      - NX_DAEMON=false
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=1000
+      - WATCHPACK_POLLING=true
+      - NX_CACHE_DIRECTORY=/tmp/.nx-cache-public
+    command: npx nx serve public
+    volumes:
+      - .:/app
+      - node_modules_volume:/app/node_modules
+      
+  kyc:
+    container_name: kyc_service_booking
+    restart: always
+    depends_on:
+      - deps
+    build:
+      context: .
+      dockerfile: apps/kyc/DockerFile.prod
+    ports:
+      - '3001:3001'
+    environment:
+      - NX_DAEMON=false
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=1000
+      - WATCHPACK_POLLING=true
+      - NX_CACHE_DIRECTORY=/tmp/.nx-cache-kyc
+    volumes:
+      - .:/app
+      - node_modules_volume:/app/node_modules
+    command: npx nx serve kyc
+    
+  notifications:
+    container_name: notifications_service_booking
+    restart: always
+    depends_on:
+      - deps
+    build:
+      context: .
+      dockerfile: apps/notifications/DockerFile.prod
+    ports:
+      - '3002:3002'
+    environment:
+      - NX_DAEMON=false
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=1000
+      - WATCHPACK_POLLING=true
+      - NX_CACHE_DIRECTORY=/tmp/.nx-cache-notifications
+    volumes:
+      - .:/app
+      - node_modules_volume:/app/node_modules
+    command: npx nx serve notifications
+    
+  postgres_db:
+    image: postgres:latest
+    container_name: postgres_booking
+    restart: always
+    environment:
+      POSTGRES_USER: yeqorka
+      POSTGRES_PASSWORD: test228
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_booking:/var/lib/postgresql/data
+      
+  redis:
+    image: redis:latest
+    container_name: redis_booking
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_booking:/data
+      
+  nginx:
+    container_name: nginx_booking
+    build:
+      context: .
+      dockerfile: nginx/DockerFile.prod
+    ports:
+      - "80:80"
+
+volumes:
+  postgres_data_booking:
+  redis_data_booking:
+  node_modules_volume: 

@@ -21,6 +21,6 @@ export class ApartmentAddress {
   @Column({ nullable: true })
   buildingDetails?: string; 
 
-  @OneToOne(() => Apartment, (apartment) => apartment.address)
+  @OneToOne(() => Apartment, (apartment) => apartment.address, { onDelete: 'CASCADE' })
   apartment: Apartment;
 }

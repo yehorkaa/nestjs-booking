@@ -5,8 +5,7 @@ import { User } from '../user/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import jwtUserConfig from './config/jwt-user.config';
 import { ConfigModule } from '@nestjs/config';
-import { TenantAuthController } from './controllers/tenant-auth.controller';
-import { PropertyOwnerAuthController } from './controllers/property-owner-auth.controller';
+import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RefreshTokenIdsStorage } from './storages/refresh-token-ids.storage';
@@ -20,10 +19,7 @@ import { OtpStorage } from './storages/otp.storage';
     ConfigModule.forFeature(jwtUserConfig),
     CacheModule.register(),
   ],
-  controllers: [
-    TenantAuthController,
-    PropertyOwnerAuthController,
-  ],
+  controllers: [AuthController],
   providers: [AuthService, RefreshTokenIdsStorage, OtpStorage],
 })
 export class AuthModule {}

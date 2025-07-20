@@ -15,6 +15,9 @@ module.exports = {
       optimization: false,
       outputHashing: 'none',
       generatePackageJson: true,
+      watch: true,
+      poll: 1000,
+      watchDependencies: ['apps/public/**/*.ts'],
     }),
   ],
 };

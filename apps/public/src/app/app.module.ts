@@ -22,10 +22,10 @@ import postgresConfig from './config/postgres.config';
 import mailerConfig from './config/mailer.config';
 
 // Plan:
-// 1. finish work with upload module
-// 2. finish work with aws module
-// 3. add CRUD for user profile
-// 4. finish nestjs auth course ( look thoroughly at role module )
+// 1. finish work with upload module -- DONE
+// 2. finish work with aws module -- DONE
+// 3. add CRUD for user profile -- DONE
+// 4. create microservoces for kyc, notifications and integrate it with app
 // 5. check auth for property owner
 // 6. create CRUD for apartment
 // 7. create CRUD for apartment reservations
