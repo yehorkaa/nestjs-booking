@@ -1,11 +1,11 @@
 import { CloudFrontClient } from '@aws-sdk/client-cloudfront';
 import { Provider, Scope } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
-import awsS3Config from '../config/aws.config';
+import awsConfig from '../config/aws.config';
 
 export const AwsCloudfrontClientProvider: Provider<CloudFrontClient> = {
   provide: CloudFrontClient,
-  useFactory: (awsS3Configuration: ConfigType<typeof awsS3Config>) => {
+  useFactory: (awsS3Configuration: ConfigType<typeof awsConfig>) => {
     return new CloudFrontClient({
       region: awsS3Configuration.region,
       credentials: {
@@ -15,5 +15,5 @@ export const AwsCloudfrontClientProvider: Provider<CloudFrontClient> = {
     });
   },
   scope: Scope.DEFAULT,
-  inject: [awsS3Config.KEY],
+  inject: [awsConfig.KEY],
 };

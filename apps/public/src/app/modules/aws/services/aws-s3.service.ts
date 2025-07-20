@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import awsS3Config from '../config/aws.config';
+import awsConfig from '../config/aws.config';
 import { ConfigType } from '@nestjs/config';
 import {
   PutObjectCommand,
@@ -12,8 +12,8 @@ import {
 @Injectable()
 export class AwsS3Service {
   constructor(
-    @Inject(awsS3Config.KEY)
-    private readonly awsS3Configuration: ConfigType<typeof awsS3Config>,
+    @Inject(awsConfig.KEY)
+    private readonly awsConfiguration: ConfigType<typeof awsConfig>,
     @Inject(S3Client)
     private readonly s3: S3Client
   ) {}
@@ -25,7 +25,7 @@ export class AwsS3Service {
   ) {
     await this.s3.send(
       new PutObjectCommand({
-        Bucket: this.awsS3Configuration.bucketName,
+        Bucket: this.awsConfiguration.bucketName,
         Key: fileKey,
         Body: fileBuffer,
         ...rest,
@@ -35,13 +35,13 @@ export class AwsS3Service {
   }
 
   getPublicUrl(fileKey: string) {
-    return `https://${this.awsS3Configuration.cloudfrontDomain}/${fileKey}`;
+    return `https://${this.awsConfiguration.cloudfrontDomain}/${fileKey}`;
   }
 
   async delete(fileKey: string, rest?: Partial<DeleteObjectCommandInput>) {
     await this.s3.send(
       new DeleteObjectCommand({
-        Bucket: this.awsS3Configuration.bucketName,
+        Bucket: this.awsConfiguration.bucketName,
         Key: fileKey,
         ...rest,
       })

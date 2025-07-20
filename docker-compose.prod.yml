@@ -1,13 +1,14 @@
 services:
-  # Dedicated service for installing dependencies once
+  # TODO: create prod dependencies
   deps:
     container_name: deps_booking
     build:
       context: .
-      dockerfile: Dockerfile.base.dev
+      dockerfile: Dockerfile.prod.base
     volumes:
       - node_modules_volume:/app/node_modules
       - .:/app    
+    command: tail -f /dev/null
   public_api:
     container_name: public_api_booking
     restart: always
@@ -17,7 +18,7 @@ services:
       - redis
     build:
       context: .
-      dockerfile: apps/public/DockerFile.dev
+      dockerfile: apps/public/DockerFile.prod
     ports:
       - '3000:3000'
     environment:
@@ -38,7 +39,7 @@ services:
       - deps
     build:
       context: .
-      dockerfile: apps/kyc/Dockerfile.dev
+      dockerfile: apps/kyc/DockerFile.prod
     ports:
       - '3001:3001'
     environment:
@@ -59,7 +60,7 @@ services:
       - deps
     build:
       context: .
-      dockerfile: apps/notifications/Dockerfile.dev
+      dockerfile: apps/notifications/DockerFile.prod
     ports:
       - '3002:3002'
     environment:
@@ -99,13 +100,9 @@ services:
     container_name: nginx_booking
     build:
       context: .
-      dockerfile: nginx/DockerFile.dev
+      dockerfile: nginx/DockerFile.prod
     ports:
       - "80:80"
-    depends_on:
-      - public_api
-      - kyc
-      - notifications
 
 volumes:
   postgres_data_booking:

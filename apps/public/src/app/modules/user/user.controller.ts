@@ -12,7 +12,6 @@ export class UserController {
   @Get('all')
   @UserRoles(USER_ROLES.TENANT, USER_ROLES.PROPERTY_OWNER)
   async findAll(@ActiveUser() activeUser: ActiveUserModel) {
-    console.log('activeUser', activeUser);
     const response = await this.userService.findAll();
     return response;
   }
