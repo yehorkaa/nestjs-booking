@@ -5,4 +5,9 @@ export class AppService {
   getData(): { message: string } {
     return { message: 'Hello FROM KYC SERVICE' };
   }
+
+  requestPropertyOwnerRole() {
+    return { message: 'Request property owner role' };
+  }
+
 }
