@@ -5,12 +5,12 @@ import { ConfigType } from '@nestjs/config';
 
 export const AwsS3ClientProvider: Provider<S3Client> = {
   provide: S3Client,
-  useFactory: (awsS3Configuration: ConfigType<typeof awsConfig>) => {
+  useFactory: (awsConfiguration: ConfigType<typeof awsConfig>) => {
     return new S3Client({
-      region: awsS3Configuration.region,
+      region: awsConfiguration.region,
       credentials: {
-        accessKeyId: awsS3Configuration.accessKeyId,
-        secretAccessKey: awsS3Configuration.secretAccessKey,
+        accessKeyId: awsConfiguration.accessKeyId,
+        secretAccessKey: awsConfiguration.secretAccessKey,
       },
     });
   },

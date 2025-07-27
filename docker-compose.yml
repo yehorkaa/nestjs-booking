@@ -1,8 +1,8 @@
 services:
   # Dedicated service for installing dependencies once
-  postgres_db:
+  public_postgres_db:
     image: postgres:latest
-    container_name: postgres_booking
+    container_name: public_postgres_booking
     restart: always
     environment:
       POSTGRES_USER: yeqorka
@@ -11,16 +11,75 @@ services:
     ports:
       - '5433:5432'
     volumes:
-      - postgres_data_booking:/var/lib/postgresql/data
+      - public_postgres_data_booking:/var/lib/postgresql/data
 
-  redis:
+  public_redis:
     image: redis:latest
-    container_name: redis_booking
+    container_name: public_redis_booking
     restart: always
     ports:
       - '6379:6379'
     volumes:
-      - redis_data_booking:/data
+      - public_redis_data_booking:/data
+
+  admin_postgres_db:
+    image: postgres:latest
+    container_name: admin_postgres_booking
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: test228
+      POSTGRES_DB: postgres
+    ports:
+      - '5435:5432'
+    volumes:
+      - admin_postgres_data_booking:/var/lib/postgresql/data
+
+  kyc_postgres_db:
+    image: postgres:latest
+    container_name: kyc_postgres_booking
+    restart: always
+    environment:
+      POSTGRES_USER: biba
+      POSTGRES_PASSWORD: test228
+      POSTGRES_DB: postgres
+    ports:
+      - '5434:5432'
+    volumes:
+      - kyc_postgres_data_booking:/var/lib/postgresql/data
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper_booking
+    restart: always
+    ports:
+      - '2181:2181'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data_booking:/var/lib/zookeeper/data
+      - zookeeper_log_booking:/var/lib/zookeeper/log
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka_booking
+    restart: always
+    ports:
+      - '9092:9092'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    volumes:
+      - kafka_data_booking:/var/lib/kafka/data
+    depends_on:
+      - zookeeper
 
   nginx:
     container_name: nginx_booking
@@ -31,5 +90,10 @@ services:
       - '80:80'
 
 volumes:
-  postgres_data_booking:
-  redis_data_booking:
+  public_postgres_data_booking:
+  public_redis_data_booking:
+  kyc_postgres_data_booking:
+  admin_postgres_data_booking:
+  kafka_data_booking:
+  zookeeper_data_booking:
+  zookeeper_log_booking:

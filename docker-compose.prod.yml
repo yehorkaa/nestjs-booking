@@ -1,14 +1,13 @@
 services:
-  # TODO: create prod dependencies
+  # TODO: create prod dependencies and refactor service names, volumes, etc like in docker-compose.yml
   deps:
     container_name: deps_booking
     build:
       context: .
       dockerfile: Dockerfile.prod.base
     volumes:
-      - node_modules_volume:/app/node_modules
-      - .:/app    
-    command: tail -f /dev/null
+      - node_modules_volume:/app/node_modules # It means "take node_modules_volume and put it in /app/node_modules"
+      - .:/app # It means "take . from current directory and put it in /app, basically the same as WORKDIR /app"
   public_api:
     container_name: public_api_booking
     restart: always

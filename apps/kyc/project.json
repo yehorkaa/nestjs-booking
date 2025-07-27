@@ -6,14 +6,28 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "nx:run-commands",
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
       "options": {
-        "command": "webpack-cli build",
-        "args": ["node-env=production"]
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/kyc",
+        "main": "apps/kyc/src/main.ts",
+        "tsConfig": "apps/kyc/tsconfig.app.json",
+        "assets": ["apps/kyc/src/assets"],
+        "webpackConfig": "apps/kyc/webpack.config.js"
       },
       "configurations": {
         "development": {
-          "args": ["node-env=development"]
+          "optimization": false,
+          "extractLicenses": false,
+          "inspect": false
+        },
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false
         }
       }
     },
