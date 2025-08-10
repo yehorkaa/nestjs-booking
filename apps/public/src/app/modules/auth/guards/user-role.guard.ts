@@ -1,15 +1,16 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { USER_ROLES_KEY } from '../decorators/user-role.decorator';
-import { UserRole } from '../../user/user.type';
+
 import { ActiveUserModel } from '../decorators/active-user.decorator';
+import { PublicUserRole } from '@nestjs-booking-clone/common';
 
 @Injectable()
 export class UserRoleGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.get<UserRole[]>(
+    const requiredRoles = this.reflector.get<PublicUserRole[]>(
       USER_ROLES_KEY,
       context.getHandler()
     );
@@ -27,7 +28,7 @@ export class UserRoleGuard implements CanActivate {
     const rolesMap = user.roles.reduce((acc, role) => {
       acc[role] = true;
       return acc;
-    }, {} as Record<UserRole, boolean>);
+    }, {} as Record<PublicUserRole, boolean>);
 
     return requiredRoles.some((role) => rolesMap[role]);
   }

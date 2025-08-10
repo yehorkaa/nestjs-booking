@@ -4,14 +4,14 @@ import { CreateApartmentDto } from './dto/create-apartment.dto';
 import { UpdateApartmentDto } from './dto/update-apartment.dto';
 import { UserRoleGuard } from '../auth/guards/user-role.guard';
 import { UserRoles } from '../auth/decorators/user-role.decorator';
-import { USER_ROLES } from '../user/user.const';
+import { PUBLIC_USER_ROLES } from '@nestjs-booking-clone/common';
 
 @Controller('apartment')
 export class ApartmentController {
   constructor(private readonly apartmentService: ApartmentService) {}
 
   @Post()
-  @UserRoles(USER_ROLES.PROPERTY_OWNER)
+  @UserRoles(PUBLIC_USER_ROLES.PROPERTY_OWNER)
   @UseGuards(UserRoleGuard)
   create(@Body() createApartmentDto: CreateApartmentDto) {
     return this.apartmentService.create(createApartmentDto);
