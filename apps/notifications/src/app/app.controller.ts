@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { EventPattern } from '@nestjs/microservices';
-import { OtpRequestDto, KycRequestDto } from './dto';
+import { OtpRequestCreatedDto, KycRequestDto } from './dto';
 
 @Controller()
 export class AppController {
@@ -12,12 +12,22 @@ export class AppController {
     return this.appService.getData();
   }
 
-  @EventPattern('otp.request.created')
-  async handleOtpRequestCreated(data: OtpRequestDto) {
+  @EventPattern('notifications.otp.request.created')
+  async handleOtpRequestCreated(data: OtpRequestCreatedDto) {
     return this.appService.handleOtpRequestCreated(data);
   }
 
-  @EventPattern('kyc.request.created')
+  @EventPattern('notifications.otp.request.created.retry')
+  async handleOtpRequestCreatedRetry(data: OtpRequestCreatedDto) {
+    return this.appService.handleOtpRequestCreatedRetry(data);
+  }
+
+  @EventPattern('notifications.otp.request.created.dlt')
+  async handleOtpRequestCreatedDlt(data: OtpRequestCreatedDto) {
+    return this.appService.handleOtpRequestCreatedDlt(data);
+  }
+
+  @EventPattern('notifications.kyc.request.created')
   async handleKycRequestCreated(data: KycRequestDto) {
     return this.appService.handleKycRequestCreated(data);
   }

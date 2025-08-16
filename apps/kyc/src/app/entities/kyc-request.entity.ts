@@ -12,7 +12,7 @@ import {
   KYC_REQUEST_STATUS,
   KycRequestStatus,
 } from '@nestjs-booking-clone/common';
-import { FileEntity } from './file.entity';
+import { KycRequestPassport } from './kyc-request-passport.entity';
 
 @Entity()
 export class KycRequest {
@@ -53,12 +53,4 @@ export class KycRequest {
 
   @UpdateDateColumn()
   updatedAt: Date;
-}
-
-@Entity()
-export class KycRequestPassport extends FileEntity {
-  @ManyToOne(() => KycRequest, (kycRequest) => kycRequest.passport, {
-    onDelete: 'CASCADE',
-  })
-  kycRequest: KycRequest;
 }

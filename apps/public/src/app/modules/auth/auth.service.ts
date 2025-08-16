@@ -147,7 +147,7 @@ export class AuthService {
       }
       const { otp } = await this.otpStorage.generateOtp();
       await this.otpStorage.insert(user.phoneNumber, otp);
-      this.publicClient.emit('otp.request.created', {
+      this.publicClient.emit('notifications.otp.request.created', {
         email: user.email,
         subject: 'OTP for NestJS Booking Clone',
         otp,

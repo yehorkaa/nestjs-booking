@@ -1,6 +1,5 @@
-import { IsEmail, IsString, IsNotEmpty } from 'class-validator';
-
-export class OtpRequestDto {
+import { IsEmail, IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+export class OtpRequestCreatedDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -12,4 +11,8 @@ export class OtpRequestDto {
   @IsString()
   @IsNotEmpty()
   otp: string;
-} 
+
+  @IsNumber()
+  @IsOptional()
+  attempt?: number;
+}

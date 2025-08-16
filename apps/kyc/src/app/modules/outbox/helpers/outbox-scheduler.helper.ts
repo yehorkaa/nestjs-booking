@@ -23,12 +23,14 @@ export class OutboxScheduler {
       take: 100,
     });
 
-    for (const event of events) {
-      await this.outboxQueue.add(
-        BULL_QUEUE_PROCESSES.PROCESS_EVENT,
-        { eventId: event.id },
-        { attempts: 5, backoff: 5000 }
-      );
+    if (events.length === 0) {
+      return;
     }
+
+    await this.outboxQueue.add(
+      BULL_QUEUE_PROCESSES.PROCESS_EVENTS,
+      { eventIds: events.map((event) => event.id) },
+      { attempts: 3, backoff: 5000 },
+    );
   }
 }

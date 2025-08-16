@@ -1,9 +1,10 @@
-import { KycRequestStatus } from '@nestjs-booking-clone/common';
+import { KycRequestStatus, KYC_REQUEST_STATUS } from '@nestjs-booking-clone/common';
+import { IsEmail, IsEnum } from 'class-validator';
 
 export class KycRequestDto {
-  // @IsEmail() TODO: Figure out wether we need to validate and use send instead of emit
+  @IsEmail()
   email: string;
 
-  // @IsEnum(KYC_REQUEST_STATUS)
+  @IsEnum(KYC_REQUEST_STATUS)
   status: KycRequestStatus;
 }

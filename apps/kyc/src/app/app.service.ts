@@ -71,7 +71,7 @@ export class AppService {
           const outboxEvent = outboxRepo.create({
             aggregateType: 'kyc-request-user',
             aggregateId: newUser.id,
-            eventType: 'kyc.request.created',
+            eventType: 'notifications.kyc.request.created',
             payload: {
               email: newUser.email,
               status: newKycRequest.status,
@@ -130,7 +130,7 @@ export class AppService {
         const outboxEvent = outboxRepo.create({
           aggregateType: 'kyc-request',
           aggregateId: user.id,
-          eventType: 'kyc.request.created',
+          eventType: 'notifications.kyc.request.created',
           payload: {
             email: user.email,
             status: newKycRequest.status,

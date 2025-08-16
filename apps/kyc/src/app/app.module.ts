@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import postgresConfig from './config/postgres.config';
 import { User } from './entities/user.entity';
 import { KycRequest } from './entities/kyc-request.entity';
+import { KycRequestPassport } from './entities/kyc-request-passport.entity';
+import { FileEntity } from './entities/file.entity';
 import { BullModule } from '@nestjs/bull';
 import redisConfig from './config/redis.config';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -56,7 +58,7 @@ import { OutboxEvent } from './modules/outbox/entities/outbox.entity';
     ScheduleModule.forRoot(),
     CommonModule,
     OutboxModule,
-    TypeOrmModule.forFeature([User, KycRequest, OutboxEvent]), // refactor
+    TypeOrmModule.forFeature([User, KycRequest, KycRequestPassport, FileEntity, OutboxEvent]), // refactor
   ],
   controllers: [AppController],
   providers: [AppService, TransactionHelper],

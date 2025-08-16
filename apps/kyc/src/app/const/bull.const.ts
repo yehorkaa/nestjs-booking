@@ -3,5 +3,5 @@ export const BULL_QUEUES = {
 } as const;
 
 export const BULL_QUEUE_PROCESSES = {
-  PROCESS_EVENT: 'process-event',
+  PROCESS_EVENTS: 'process-events',
 } as const;

@@ -7,6 +7,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import mailerConfig from './config/mailer.config';
 import { join } from 'path';
+import { MessagingModule } from './modules/messaging/messaging.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { join } from 'path';
       isGlobal: true,
       load: [kafkaConfig, mailerConfig],
     }),
+    MessagingModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (mailerConfiguration: ConfigType<typeof mailerConfig>) => {

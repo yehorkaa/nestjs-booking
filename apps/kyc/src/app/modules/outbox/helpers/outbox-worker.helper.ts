@@ -1,7 +1,7 @@
 import { Inject, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OutboxEvent } from '../entities/outbox.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ClientKafka } from '@nestjs/microservices';
 import { Job } from 'bull';
 import { Process, Processor } from '@nestjs/bull';
@@ -16,22 +16,29 @@ export class OutboxWorker {
     @Inject(CLIENT_MODULES.KYC_SERVICE) private kycClient: ClientKafka
   ) {}
 
-  @Process(BULL_QUEUE_PROCESSES.PROCESS_EVENT)
-  async handleOutboxJob(job: Job<{ eventId: string }>) {
-    const event = await this.outboxRepository.findOneBy({
-      id: job.data.eventId,
+  @Process(BULL_QUEUE_PROCESSES.PROCESS_EVENTS)
+  async handleOutboxJob(job: Job<{ eventIds: string[] }>) {
+    const events = await this.outboxRepository.findBy({
+      id: In(job.data.eventIds),
+      status: OUTBOX_STATUSES.PENDING,
     });
 
-    if (!event || event.status !== OUTBOX_STATUSES.PENDING) {
+    if (events.length === 0) {
       return;
     }
 
-    try {
+    const processEventsQueue = events.map(async (event) => {
       this.kycClient.emit(event.eventType, event.payload);
-      await this.outboxRepository.update(event.id, { status: OUTBOX_STATUSES.SENT });
-      Logger.log(`✅ Event ${event.id} sent to Kafka`);
+      await this.outboxRepository.update(event.id, {
+        status: OUTBOX_STATUSES.SENT,
+      });
+      Logger.log(`Kafka: Event ${event.id} sent to ${event.eventType}`);
+    });
+
+    try {
+      await Promise.all(processEventsQueue);
     } catch (error) {
-      Logger.error(`Failed to process event ${event.id}:`, error);
+      Logger.error(`Failed to process events:`, error);
       throw error;
     }
   }
