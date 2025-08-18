@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { OtpController } from './controllers/otp.controller';
+import { KycController } from './controllers/kyc.controller';
+import { OtpService } from './services/otp.service';
+import { KycService } from './services/kyc.service';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import kafkaConfig from './config/kafka.config';
 import { MailerModule } from '@nestjs-modules/mailer';
@@ -47,7 +51,7 @@ import { MessagingModule } from './modules/messaging/messaging.module';
       inject: [mailerConfig.KEY],
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, OtpController, KycController],
+  providers: [AppService, OtpService, KycService],
 })
 export class AppModule {}

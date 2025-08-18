@@ -5,3 +5,4 @@ export * from './roles.const';
 export * from './providers.const';
 export * from './kyc.const';
 export * from './messaging';
+export * from './kafka-topics.const';

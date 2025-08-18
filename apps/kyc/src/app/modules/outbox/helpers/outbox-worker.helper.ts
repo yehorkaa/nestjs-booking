@@ -27,16 +27,18 @@ export class OutboxWorker {
       return;
     }
 
-    const processEventsQueue = events.map(async (event) => {
-      this.kycClient.emit(event.eventType, event.payload);
-      await this.outboxRepository.update(event.id, {
-        status: OUTBOX_STATUSES.SENT,
-      });
-      Logger.log(`Kafka: Event ${event.id} sent to ${event.eventType}`);
-    });
-
     try {
-      await Promise.all(processEventsQueue);
+      for (const event of events) {
+        this.kycClient.emit(event.eventType, {
+          ...event.payload,
+          outboxId: event.id,
+        });
+        Logger.log(`Kafka: Event ${event.id} sent to ${event.eventType}`);
+      }
+      await this.outboxRepository.update(
+        { id: In(job.data.eventIds) },
+        { status: OUTBOX_STATUSES.SENT }
+      );
     } catch (error) {
       Logger.error(`Failed to process events:`, error);
       throw error;
