@@ -1,0 +1,19 @@
+export const CLIENT_MODULES = { // used for nest injections
+  NOTIFICATION_SERVICE: 'NOTIFICATION_SERVICE',
+  KYC_SERVICE: 'KYC_SERVICE',
+  ADMIN_SERVICE: 'ADMIN_SERVICE',
+  PUBLIC_SERVICE: 'PUBLIC_SERVICE',
+} as const;
+
+export const KAFKA_GROUP_ID = {
+  KYC_CONSUMER: 'KYC_CONSUMER',
+  NOTIFICATION_CONSUMER: 'NOTIFICATION_CONSUMER',
+} as const;
+
+export const OUTBOX_STATUSES = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+} as const;
+
+export type OutboxStatus = (typeof OUTBOX_STATUSES)[keyof typeof OUTBOX_STATUSES];

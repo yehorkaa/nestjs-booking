@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
-import { ConfigModule, ConfigType } from '@nestjs/config';
+import { ConfigModule, ConfigService, ConfigType } from '@nestjs/config';
 import { UserProfileModule } from './modules/user-profile/user-profile.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ApartmentModule } from './modules/apartment/apartment.module';
@@ -13,13 +13,11 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { Keyv } from 'keyv';
 import { CacheableMemory } from 'cacheable';
 import { createKeyv } from '@keyv/redis';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { UploadModule } from './modules/upload/upload.module';
 import { AwsModule } from './modules/aws/aws.module';
 import redisCacheConfig from './config/cache.config';
 import postgresConfig from './config/postgres.config';
-import mailerConfig from './config/mailer.config';
+import kafkaConfig from './config/kafka.config';
 
 // Plan:
 // 1. finish work with upload module -- DONE
@@ -38,7 +36,7 @@ import mailerConfig from './config/mailer.config';
     ConfigModule.forRoot({
       envFilePath: ['apps/public/.env'],
       isGlobal: true,
-      load: [redisCacheConfig, postgresConfig, mailerConfig],
+      load: [redisCacheConfig, postgresConfig, kafkaConfig],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -54,7 +52,7 @@ import mailerConfig from './config/mailer.config';
           password: postgresConfiguration.password,
           database: postgresConfiguration.database,
           autoLoadEntities: true,
-          synchronize: true,
+          synchronize: postgresConfiguration.synchronize,
         };
       },
       inject: [postgresConfig.KEY],
@@ -73,35 +71,6 @@ import mailerConfig from './config/mailer.config';
         };
       },
       inject: [redisCacheConfig.KEY],
-    }),
-    MailerModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (mailerConfiguration: ConfigType<typeof mailerConfig>) => {
-        console.log('mailerConfiguration 🔧', mailerConfiguration);
-        return {
-          transport: {
-            host: mailerConfiguration.host,
-            port: mailerConfiguration.port,
-            secure: false,
-            auth: {
-              user: mailerConfiguration.auth.user,
-              pass: mailerConfiguration.auth.pass,
-            },
-          },
-          defaults: {
-            from: `"No Reply" nestjs-booking-clone@gmail.com`,
-          },
-          preview: false,
-          template: {
-            dir: __dirname + '/app/templates',
-            adapter: new PugAdapter(),
-            options: {
-              strict: true,
-            },
-          },
-        };
-      },
-      inject: [mailerConfig.KEY],
     }),
     CommonModule,
     UserModule,

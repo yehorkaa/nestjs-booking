@@ -10,8 +10,8 @@ import { ApartmentReservation } from '../../../modules/apartment/entities/apartm
 import { ApartmentFavorite } from '../../../modules/apartment/entities/apartment-favorite.entity';
 import { HotelReservation } from '../../../modules/hotel/entities/hotel-reservation.entity';
 import { HotelFavorite } from '../../../modules/hotel/entities/hotel-favorite.entity';
-import { USER_PROVIDERS, USER_ROLES } from '../user.const';
-import { UserProvider, UserRole } from '../user.type';
+import { PublicUserProvider, PublicUserRole } from '@nestjs-booking-clone/common';
+import { PUBLIC_USER_PROVIDERS, PUBLIC_USER_ROLES } from '@nestjs-booking-clone/common';
 
 @Entity()
 export class User {
@@ -27,16 +27,16 @@ export class User {
   @Column({ nullable: true, unique: true })
   phoneNumber: string;
 
-  @Column({ type: 'enum', enum: USER_PROVIDERS, default: USER_PROVIDERS.LOCAL })
-  provider: UserProvider;
+  @Column({ type: 'enum', enum: PUBLIC_USER_PROVIDERS, default: PUBLIC_USER_PROVIDERS.LOCAL })
+  provider: PublicUserProvider;
 
   @Column({
     type: 'enum',
-    enum: USER_ROLES,
+    enum: PUBLIC_USER_ROLES,
     array: true,
-    default: [USER_ROLES.TENANT],
+    default: [PUBLIC_USER_ROLES.TENANT],
   })
-  roles: UserRole[];
+  roles: PublicUserRole[];
 
   @OneToOne(() => UserProfile, (profile) => profile.user, {
     cascade: true, // cascade allows us to save user with profile, but we can't do this in opposite direction, and also cascade should be used in one direction only

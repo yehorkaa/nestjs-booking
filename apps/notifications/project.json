@@ -15,7 +15,14 @@
         "outputPath": "dist/apps/notifications",
         "main": "apps/notifications/src/main.ts",
         "tsConfig": "apps/notifications/tsconfig.app.json",
-        "assets": ["apps/notifications/src/assets"],
+        "assets": [
+          "apps/notifications/src/assets",
+          {
+            "glob": "**/*",
+            "input": "apps/notifications/src/app/mail-templates",
+            "output": "mail-templates"
+          }
+        ],
         "webpackConfig": "apps/notifications/webpack.config.js"
       },
       "configurations": {
