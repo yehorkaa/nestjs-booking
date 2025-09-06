@@ -15,6 +15,11 @@ export class UserService {
     });
     return users;
   }
+  
+  async deleteAll() {
+    const deletedUsers = await this.userRepository.deleteAll();
+    return deletedUsers;
+  }
 
   async deleteById(id: string) {
     const user = await this.userRepository.findOneBy({ id });

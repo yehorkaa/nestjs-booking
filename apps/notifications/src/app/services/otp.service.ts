@@ -14,12 +14,12 @@ import {
 
 @Injectable()
 export class OtpService {
-  private readonly MAX_ATTEMPTS = 3;
+  private readonly MAX_FAIL_ATTEMPTS = 3;
 
   constructor(
     private readonly mailerService: MailerService,
     @Inject(CLIENT_MODULES.NOTIFICATION_SERVICE)
-    private readonly notificationsClient: ClientKafka
+    private readonly notificationsClient: ClientKafka,
   ) {}
 
   async handleOtpRequestCreated(data: OtpRequestCreatedDto) {
@@ -39,13 +39,14 @@ export class OtpService {
       });
     } catch (e) {
       const attempt = data?.attempt ?? 0;
-      if (attempt < this.MAX_ATTEMPTS) {
+      if (attempt < this.MAX_FAIL_ATTEMPTS) {
+        // TODO: figure out about other methods of client kafka
         this.notificationsClient.emit(
           NOTIFICATIONS_TOPICS.OTP.REQUEST_CREATED_RETRY,
           {
             ...data,
             attempt: attempt + 1,
-          }
+          },
         );
         return;
       }

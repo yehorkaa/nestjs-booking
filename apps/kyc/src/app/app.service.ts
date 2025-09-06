@@ -9,7 +9,7 @@ import { RequestPropertyOwnerDto } from './dto/request-property-owner.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { KYC_REQUEST_STATUS, MulterFile } from '@nestjs-booking-clone/common';
+import { KYC_REQUEST_STATUS, MulterFile, NOTIFICATIONS_TOPICS, OUTBOX_STATUSES } from '@nestjs-booking-clone/common';
 import { KycRequest } from './entities/kyc-request.entity';
 import { TransactionHelper } from './helpers/transaction.helper';
 import { OutboxEvent } from './modules/outbox/entities/outbox.entity';
@@ -71,7 +71,8 @@ export class AppService {
           const outboxEvent = outboxRepo.create({
             aggregateType: 'kyc-request-user',
             aggregateId: newUser.id,
-            eventType: 'notifications.kyc.request.created',
+            eventType: NOTIFICATIONS_TOPICS.KYC.REQUEST_CREATED,
+            status: OUTBOX_STATUSES.PENDING, // default anyway, it is just for clarity
             payload: {
               email: newUser.email,
               status: newKycRequest.status,
@@ -130,7 +131,7 @@ export class AppService {
         const outboxEvent = outboxRepo.create({
           aggregateType: 'kyc-request',
           aggregateId: user.id,
-          eventType: 'notifications.kyc.request.created',
+          eventType: NOTIFICATIONS_TOPICS.KYC.REQUEST_CREATED,
           payload: {
             email: user.email,
             status: newKycRequest.status,

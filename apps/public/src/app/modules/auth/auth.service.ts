@@ -14,7 +14,7 @@ import jwtUserConfig from './config/jwt-user.config';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UserProfile } from '../user-profile/entities/user-profile.entity';
 import { SignInDto } from './dto/sign-in.dto';
-import { CLIENT_MODULES, PG_ERROR_CODES } from '@nestjs-booking-clone/common';
+import { CLIENT_MODULES, NOTIFICATIONS_TOPICS, PG_ERROR_CODES } from '@nestjs-booking-clone/common';
 import { BCRYPT_SERVICE } from '../common/const/service.const';
 import { ActiveUserModel } from './decorators/active-user.decorator';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -29,6 +29,7 @@ import { LogoutDto } from './dto/log-out.dto';
 import { RequestOtpDto } from './dto/request-otp.dto';
 import { pick } from 'lodash';
 import { ClientKafka } from '@nestjs/microservices';
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class AuthService {
   constructor(
@@ -147,10 +148,11 @@ export class AuthService {
       }
       const { otp } = await this.otpStorage.generateOtp();
       await this.otpStorage.insert(user.phoneNumber, otp);
-      this.publicClient.emit('notifications.otp.request.created', {
+      this.publicClient.emit(NOTIFICATIONS_TOPICS.OTP.REQUEST_CREATED, {
         email: user.email,
         subject: 'OTP for NestJS Booking Clone',
         otp,
+        messageId: uuidv4(),
       });
       return { message: `OTP sent to ${user.email}. Check your inbox.` };
     } catch (error) {

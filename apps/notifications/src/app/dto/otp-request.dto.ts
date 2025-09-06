@@ -15,4 +15,8 @@ export class OtpRequestCreatedDto {
   @IsNumber()
   @IsOptional()
   attempt?: number;
+
+  @IsString()
+  @IsNotEmpty()
+  messageId: string;
 }
