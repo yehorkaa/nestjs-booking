@@ -33,6 +33,9 @@ import { AppModule } from './app/app.module';
 // createMicroservice() - для микросервисов, но из минусов это отсутсвие HTTP, и нет возможности использовать проксирование через nginx/aws
 // create() - Универсальность, но из минусов это настройка инфраструктуры, которая не нужна для микросервисов, и то что по памяти немного тяжелее
 
+// noAck true ( which is default ) options is used to disable message acknowledgement, so that the message is not removed from the queue until the consumer acknowledges it
+// *message acknowledgement* - is a process of confirming that the message has been processed successfully.
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const globalPrefix = 'api/kyc';

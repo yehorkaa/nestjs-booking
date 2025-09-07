@@ -44,4 +44,17 @@ export class OutboxWorker {
       throw error;
     }
   }
+
+  async handleCleanOutboxEvents(job: Job<{ eventIds: string[] }>) {
+    try {
+      await this.outboxRepository.delete({
+        id: In(job.data.eventIds),
+        status: OUTBOX_STATUSES.SENT,
+      });
+    } catch (e) {
+      Logger.error(`Failed to clean events:`, e);
+      Logger.log('job data', JSON.stringify(job.data));
+      throw e;
+    }
+  }
 }

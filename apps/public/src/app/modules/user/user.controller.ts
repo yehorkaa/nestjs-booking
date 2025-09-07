@@ -1,18 +1,25 @@
 import { Controller, Delete, Get, Param } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserRoles } from '../../modules/auth/decorators/user-role.decorator';
 import { ActiveUser } from '../auth/decorators/active-user.decorator';
 import { ActiveUserModel } from '../auth/decorators/active-user.decorator';
-import { PUBLIC_USER_ROLES } from '@nestjs-booking-clone/common';
+import { AUTH_TYPE } from '@nestjs-booking-clone/common';
+import { Auth } from '../auth/decorators/auth.decorator';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('all')
-  @UserRoles(PUBLIC_USER_ROLES.TENANT, PUBLIC_USER_ROLES.PROPERTY_OWNER)
+  @Auth(AUTH_TYPE.NONE)
   async findAll(@ActiveUser() activeUser: ActiveUserModel) {
     const response = await this.userService.findAll();
+    return response;
+  }
+
+  @Delete('all')
+  @Auth(AUTH_TYPE.NONE)
+  async deleteAll() {
+    const response = await this.userService.deleteAll();
     return response;
   }
 

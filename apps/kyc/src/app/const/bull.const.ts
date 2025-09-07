@@ -4,4 +4,5 @@ export const BULL_QUEUES = {
 
 export const BULL_QUEUE_PROCESSES = {
   PROCESS_EVENTS: 'process-events',
+  CLEAN_SENT_EVENTS: 'clean-sent-events'
 } as const;

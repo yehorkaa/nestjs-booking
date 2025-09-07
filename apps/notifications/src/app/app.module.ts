@@ -12,15 +12,36 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import mailerConfig from './config/mailer.config';
 import { join } from 'path';
 import { MessagingModule } from './modules/messaging/messaging.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import postgresConfig from './config/postgres.config';
+import { InboxModule } from './modules/inbox/inbox.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: ['apps/notifications/.env'],
       isGlobal: true,
-      load: [kafkaConfig, mailerConfig],
+      load: [kafkaConfig, mailerConfig, postgresConfig],
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (postgresConfiguration: ConfigType<typeof postgresConfig>) => {
+        console.log('postgresConfiguration 🔧', postgresConfiguration);
+        return {
+          type: 'postgres',
+          host: postgresConfiguration.host,
+          port: postgresConfiguration.port,
+          username: postgresConfiguration.username,
+          password: postgresConfiguration.password,
+          database: postgresConfiguration.database,
+          autoLoadEntities: true,
+          synchronize: postgresConfiguration.synchronize,
+        };
+      },
+      inject: [postgresConfig.KEY],
     }),
     MessagingModule,
+    InboxModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (mailerConfiguration: ConfigType<typeof mailerConfig>) => {

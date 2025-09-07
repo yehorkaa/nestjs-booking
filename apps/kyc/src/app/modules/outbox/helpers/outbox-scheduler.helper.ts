@@ -20,6 +20,7 @@ export class OutboxScheduler {
   async enqueueOutboxEvents() {
     const events = await this.outboxRepository.find({
       where: { status: OUTBOX_STATUSES.PENDING },
+      order: { createdAt: 'ASC' },
       take: 100,
     });
 
@@ -30,7 +31,26 @@ export class OutboxScheduler {
     await this.outboxQueue.add(
       BULL_QUEUE_PROCESSES.PROCESS_EVENTS,
       { eventIds: events.map((event) => event.id) },
-      { attempts: 3, backoff: 5000 },
+      { attempts: 3, backoff: 5000 }
+    );
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async enqueueOutboxEventsCleaner() {
+    const events = await this.outboxRepository.find({
+      where: { status: OUTBOX_STATUSES.SENT },
+      order: { createdAt: 'ASC' },
+      take: 100,
+    });
+
+    if (events.length === 0) {
+      return;
+    }
+
+    await this.outboxQueue.add(
+      BULL_QUEUE_PROCESSES.CLEAN_SENT_EVENTS,
+      { eventIds: events.map((event) => event.id) },
+      { attempts: 3, backoff: 5000 }
     );
   }
 }
